@@ -26,6 +26,17 @@ class MovieController {
         return ResponseEntity.ok(movieService.getAllFromRepository());
     }
 
+    @GetMapping("/getN")
+    public ResponseEntity<List<Movie>> getByKategoria(@RequestBody Movie movie) throws MovieNotFoundException, BadDataException {
+        List<Movie> movieFound = movieService.findMovieByKategoria(movie.getKategoria());
+        if (movieFound != null) {
+            return ResponseEntity.ok(movieFound);
+        } else {
+            throw new MovieNotFoundException("Nie można wyświetlić, żaden obiekt nie istnieje");
+            //return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
     @GetMapping("/get/{ID}")
     public ResponseEntity<Movie> getByID(@PathVariable Long ID) throws MovieNotFoundException {
         Movie movieFound = movieService.findMovieByID(ID);

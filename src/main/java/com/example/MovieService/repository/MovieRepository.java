@@ -8,13 +8,21 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 
 public interface  MovieRepository extends JpaRepository<Movie, Long> {
 
-    @Query("SELECT m FROM Movie m WHERE m.ID=?1")
+    //@Query("SELECT m FROM Movie m WHERE m.ID=?1")
+   // Optional<Movie> findById(Long ID);
+
     Optional<Movie> findById(Long ID);
+
+    List<Movie> findByKategoriaOrderByNazwa(Kategoria kategoria);
+
+    List<Movie> findAll();
+
 
     @Modifying
     @Transactional

@@ -1,6 +1,8 @@
 package com.example.MovieService.services;
 
+import com.example.MovieService.classes.Kategoria;
 import com.example.MovieService.classes.Movie;
+import com.example.MovieService.exception.BadDataException;
 import com.example.MovieService.exception.MovieNotFoundException;
 import com.example.MovieService.repository.MovieRepository;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,20 @@ public class MovieService {
 
     public MovieService(MovieRepository movieRepository) {
         this.movieRepository = movieRepository;
+    }
+
+    public List<Movie> findMovieByKategoria(Kategoria kategoria) throws MovieNotFoundException, BadDataException {
+        if(kategoria != null) {
+            List<Movie> movie = movieRepository.findByKategoriaOrderByNazwa(kategoria);
+            if (movie.size() > 0) {
+                return movie;
+            } else {
+                throw new MovieNotFoundException("Nie znaleziono filmów, nie");
+            }
+        }
+        else{
+            throw new BadDataException("Podane złe dane");
+        }
     }
 
     public Movie findMovieByID(Long ID) {
@@ -43,7 +59,6 @@ public class MovieService {
     }
 
     public Movie postChangeAvailableTrue(Movie movie) {
-
         if(movie.isAvailable() == false){
             movieRepository.updateAvailable(movie.getID());
             return movie;
