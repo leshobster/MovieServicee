@@ -14,18 +14,32 @@ import java.util.List;
 public class Movie {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long ID;
 
     private String nazwa;
-    private String kategoria;
+
+    public boolean isAvailable() {
+        return isAvailable;
+    }
+
+    public void setAvailable(boolean available) {
+        isAvailable = available;
+    }
+
+    @Column(name = "isavailable", nullable = false, columnDefinition = "tinyint (0)")
+    public boolean isAvailable;
+
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "VARCHAR")
+    private Kategoria kategoria;
 
     public Movie() {
         this.nazwa = "nazwa"+getID();
-        this.kategoria = "";
+        this.kategoria = Kategoria.puste;
     }
 
-    public Movie(String nazwa, String kategoria) {
+    public Movie(String nazwa, Kategoria kategoria) {
         this.nazwa = nazwa;
         this.kategoria = kategoria;
     }
@@ -47,11 +61,11 @@ public class Movie {
         this.nazwa = nazwa;
     }
 
-    public String getKategoria() {
+    public Kategoria getKategoria() {
         return kategoria;
     }
 
-    public void setKategoria(String kategoria) {
+    public void setKategoria(Kategoria kategoria) {
         this.kategoria = kategoria;
     }
 

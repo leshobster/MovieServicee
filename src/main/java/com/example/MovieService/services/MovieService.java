@@ -1,82 +1,97 @@
 package com.example.MovieService.services;
 
 import com.example.MovieService.classes.Movie;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import com.example.MovieService.exception.MovieNotFoundException;
+import com.example.MovieService.repository.MovieRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MovieService {
 
-    public int findMovieByID(Long ID) {
-        for (int i = 0; i < listOfMovies.size(); i++) {
-            if (listOfMovies.get(i).getID() == ID) {
-                return i;
-            }
-        }
-        return -1;
+    private final MovieRepository movieRepository;
+
+    public MovieService(MovieRepository movieRepository) {
+        this.movieRepository = movieRepository;
     }
 
-    List<Movie> listOfMovies = new ArrayList<Movie>() {
-        {
-            add(new Movie("pierwszy", ("dramat")));
-            add(new Movie("drugi", ("komedia")));
+    public Movie findMovieByID(Long ID) {
+        Optional<Movie> movie = movieRepository.findById(ID);
+        if (movie.isPresent()) {
+            return movie.get();
+        } else {
+            return null;
         }
-    };
+    }
 
 
-    public List<Movie> getAll() {
-        return listOfMovies;
+    public List<Movie> getAllFromRepository() {
+        return movieRepository.findAll();
     }
 
     public Movie getByID(Long ID) {
-        int id = findMovieByID(ID);
-        if (id != -1) {
-            return listOfMovies.get(id);
+        Optional<Movie> movie = movieRepository.findById(ID);
+        if (movie.isPresent()) {
+            return movie.get();
         } else {
             return null;
+        }
+    }
+
+    public Movie postChangeAvailableTrue(Movie movie) {
+
+        if(movie.isAvailable() == false){
+            movieRepository.updateAvailable(movie.getID());
+            return movie;
+        }
+        else{
+            return movie;
         }
     }
 
     public Movie postByRequestBody(Movie movie) {
         if(movie.getNazwa() != null && movie.getKategoria() != null){
             Movie newMovie = new Movie(movie.getNazwa(), movie.getKategoria());
-            listOfMovies.add(newMovie);
-            return newMovie;
+
+            System.out.println(newMovie.getNazwa()+"  ---  "+ newMovie.getKategoria());
+            movieRepository.savee(newMovie);//newMovie.getNazwa(), newMovie.getKategoria());//newMovie);//newMovie);
+
+            Optional<Movie> movieFind = movieRepository.findById(newMovie.getID());
+            if (movieFind.isPresent()) {
+                return movieFind.get();
+            } else {
+                return null;
+            }
         }
         else{
             return null;
         }
     }
 
-    public Movie putByNameAndBody(Long ID,Movie movie) {
-        int id = findMovieByID(ID);
-        if (id != -1) {
+    public Movie putByNameAndBody(Movie movieOld, Movie movie) {
             if(movie.getNazwa() != null && movie.getKategoria() != null){
-                Movie carEdit = listOfMovies.get(id);
+                Movie carEdit = movieOld;
                 carEdit.setNazwa(movie.getNazwa());
                 carEdit.setKategoria(movie.getKategoria());
                 return carEdit;
             }
-            else{
+            else {
                 return null;
             }
-
-        } else {
-            return null;
-        }
-
     }
 
-    public void deleteByName(@PathVariable Long ID) {
-        int id = findMovieByID(ID);
-        if (id != -1) {
-            listOfMovies.remove(listOfMovies.get(id));
+    public void deleteByID(@PathVariable Long ID) throws Exception {
+        Optional<Movie> movie = movieRepository.findById(ID);
+        if (movie.isPresent()) {
+            movieRepository.delete(movie.get());
 
+        }
+        else{
+            throw new MovieNotFoundException("Nie istnieje film, nie usunę");
         }
 
     }
