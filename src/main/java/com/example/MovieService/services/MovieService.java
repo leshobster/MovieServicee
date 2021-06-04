@@ -49,6 +49,20 @@ public class MovieService {
         return movieRepository.findAll();
     }
 
+    public Movie getByNazwa(String nazwa) throws BadDataException {
+        if(nazwa != null) {
+            Optional<Movie> movie = movieRepository.findByNazwa(nazwa);
+            if (movie.isPresent()) {
+                return movie.get();
+            } else {
+                return null;
+            }
+        }
+        else{
+            throw new BadDataException("Podane złe dane");
+        }
+    }
+
     public Movie getByID(Long ID) {
         Optional<Movie> movie = movieRepository.findById(ID);
         if (movie.isPresent()) {
@@ -73,7 +87,7 @@ public class MovieService {
             Movie newMovie = new Movie(movie.getNazwa(), movie.getKategoria());
 
             System.out.println(newMovie.getNazwa()+"  ---  "+ newMovie.getKategoria());
-            movieRepository.savee(newMovie);//newMovie.getNazwa(), newMovie.getKategoria());//newMovie);//newMovie);
+            movieRepository.save(newMovie);//newMovie.getNazwa(), newMovie.getKategoria());//newMovie);//newMovie);
 
             Optional<Movie> movieFind = movieRepository.findById(newMovie.getID());
             if (movieFind.isPresent()) {
